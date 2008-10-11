@@ -1,14 +1,15 @@
 require 'rubygems'
 require 'rake/gempackagetask'
-
+require 'spec/rake/spectask'
 require 'merb-core'
 require 'merb-core/tasks/merb'
+require 'merb-core/test/tasks/spectasks'
 
 GEM_NAME = "merb-auth-slice-activation"
-AUTHOR = "Your Name"
-EMAIL = "Your Email"
+AUTHOR = "Daniel Neighman, Christian Kebekus"
+EMAIL = "has.sox@gmail.com"
 HOMEPAGE = "http://merbivore.com/"
-SUMMARY = "Merb Slice that provides ..."
+SUMMARY = "Merb Slice that adds basic activation functionality to merb-auth."
 GEM_VERSION = "0.9.9"
 
 spec = Gem::Specification.new do |s|
@@ -17,15 +18,17 @@ spec = Gem::Specification.new do |s|
   s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
+  s.extra_rdoc_files = ["README.textile", "LICENSE", 'TODO']
   s.summary = SUMMARY
   s.description = s.summary
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
   s.add_dependency('merb-slices', '>= 0.9.9')
+  s.add_dependency('merb-auth-core', "= 0.9.9")
+  s.add_dependency('merb-auth-more', "= 0.9.9")
   s.require_path = 'lib'
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec,app,public,stubs}/**/*")
+  s.files = %w(LICENSE README.textile Rakefile TODO) + Dir.glob("{lib,spec,app,public,stubs}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
@@ -49,7 +52,5 @@ task :gemspec do
   end
 end
 
-require 'spec/rake/spectask'
-require 'merb-core/test/tasks/spectasks'
 desc 'Default: run spec examples'
 task :default => 'spec'
