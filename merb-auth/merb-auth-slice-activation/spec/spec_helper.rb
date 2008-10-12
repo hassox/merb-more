@@ -36,6 +36,10 @@ module Merb
   end
 end
 
+class Merb::Mailer
+  self.delivery_method = :test_send
+end
+
 Spec::Runner.configure do |config|
   config.include(Merb::Test::ViewHelper)
   config.include(Merb::Test::RouteHelper)

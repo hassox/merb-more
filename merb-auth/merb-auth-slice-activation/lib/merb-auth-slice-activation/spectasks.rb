@@ -52,6 +52,16 @@ namespace :slices do
         end
       end
 
+      desc "Run all mailer specs, run a spec for a specific Mailer with MAILER=MyMailer"
+      Spec::Rake::SpecTask.new('mailer') do |t|
+        t.spec_opts = ["--format", "specdoc", "--colour"]
+        if(ENV['MAILER'])
+          t.spec_files = Dir["#{slice_root}/spec/mailer/**/#{ENV['MAILER']}_spec.rb"].sort
+        else    
+          t.spec_files = Dir["#{slice_root}/spec/mailers/**/*_spec.rb"].sort
+        end
+      end
+
       desc "Run all specs and output the result in html"
       Spec::Rake::SpecTask.new('html') do |t|
         t.spec_opts = ["--format", "html"]

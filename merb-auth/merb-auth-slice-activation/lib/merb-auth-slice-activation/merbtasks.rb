@@ -75,6 +75,15 @@ namespace :slices do
         copied.each { |f| puts "- copied #{f}" }
         preserved.each { |f| puts "! preserved override as #{f}" }
       end
+
+      desc "Freeze all mailers into your application for easy modification" 
+      task :mailers do
+        puts "Copying all mailer templates to your application - resolves any collisions"
+        copied, preserved = MerbAuthSliceActivation.mirror_files_for :mailer
+        puts "- no files to copy" if copied.empty? && preserved.empty?
+        copied.each { |f| puts "- copied #{f}" }
+        preserved.each { |f| puts "! preserved override as #{f}" }
+      end
       
       desc "Freeze all models into your application for easy modification" 
       task :models do
