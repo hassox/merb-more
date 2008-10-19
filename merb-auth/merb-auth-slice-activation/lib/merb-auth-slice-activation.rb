@@ -17,7 +17,7 @@ if defined?(Merb::Plugins)
   # Configuration options:
   # :layout - the layout to use; defaults to :merb-auth-slice-activation
   # :mirror - which path component types to use on copy operations; defaults to all
-  Merb::Slices::config[:merb_auth_slice_activation][:layout] ||= :merb_auth_slice_activation
+  Merb::Slices::config[:merb_auth_slice_activation][:layout] ||= :application
 
   # All Slice code is expected to be namespaced inside a module
   module MerbAuthSliceActivation
@@ -34,13 +34,14 @@ if defined?(Merb::Plugins)
 
     # Initialization hook - runs before AfterAppLoads BootLoader
     def self.init
-      ::Merb::Authentication.user_class.class_eval do
-        include Extlib::Hook
-        after_class_method :authenticate do |user, *rest|
-          raise ::Merb::Controller::Unauthenticated unless user && user.activated?
+      # Actually check if the user is active 
+      ::Merb::Authentication.after_authentication do |user, *rest|
+        if user.respond_to?(:active?)
+          user.active? ? user : nil
+        else 
           user
         end
-      end unless ::Merb::Authentication.user_class.nil?
+      end
     end
 
     # Activation hook - runs after AfterAppLoads BootLoader
@@ -61,7 +62,7 @@ if defined?(Merb::Plugins)
     # @note prefix your named routes with :merb_auth_slice_activation_
     #   to avoid potential conflicts with global named routes.
     def self.setup_router(scope)
-      scope.match("/activate/:activation_code", :method => :get).to(:controller => "activations", :action => "activate").name(:activate)
+      scope.match("/:activation_code").to(:controller => "activations", :action => "activate").name(:activate)
     end
 
   end
@@ -79,6 +80,7 @@ if defined?(Merb::Plugins)
   #
   # Or just call setup_default_structure! to setup a basic Merb MVC structure.
   MerbAuthSliceActivation.setup_default_structure!
+  MaAS = MerbAuthSliceActivation unless defined?(MaAS)
 
   # Add dependencies for other MerbAuthSliceActivation classes below. Example:
   # dependency "merb-auth-slice-activation/other"

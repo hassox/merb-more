@@ -1,7 +1,7 @@
 Your account has been created.
 
-  Username: <%= @ivar.email %>
+  Username: <%= @user.email %>
 
 Visit this url to activate your account:
 
-  <%= url(MerbAuthSliceActivation[:routes][:activation][:activate], :activation_code => @ivar.activation_code) %>
+  <%= activation_url(@user) %>
