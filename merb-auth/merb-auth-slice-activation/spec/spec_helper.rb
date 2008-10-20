@@ -18,6 +18,10 @@ Merb.start_environment(
   :session_store => 'memory'
 )
 
+# Setup the required configuration for the slice
+Merb::Slices::config[:merb_auth_slice_activation][:from_email]        = "homer@example.com"
+Merb::Slices::config[:merb_auth_slice_activation][:activation_host]   = "example.com"
+
 module Merb
   module Test
     module SliceHelper

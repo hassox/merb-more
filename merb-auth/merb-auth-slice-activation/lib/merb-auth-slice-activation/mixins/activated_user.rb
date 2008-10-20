@@ -67,19 +67,13 @@ class Authentication
           @activated
         end
 
-        # Checks if the user is active.
-        #
-        # ==== Returns
-        # Boolean:: +true+ is the user is active, otherwise +false+.
-        def activated?
+        # Checks to see if a user is active
+        def active?
           return false if self.new_record?
           !! activation_code.nil?
         end
-
-        # Alias for +activated?+
-        def active?
-          activated?
-        end
+        
+        alias_method :activated?, :active?
 
         # Creates and sets the activation code for the user.
         #
@@ -92,22 +86,22 @@ class Authentication
         # Sends out the activation notification.
         # Used 'Welcome' as subject if +MaAS[:activation_subject]+ is not set.
         def send_activation_notification
-          deliver_email(:activation, :subject => (MaAS[:activation_subject] || "Welcome" ))
+          deliver_activation_email(:activation,  :subject => (MaAS[:activation_subject] || "Welcome" ))
         end
 
         # Sends out the signup notification.
         # Used 'Please Activate Your Account' as subject if +MaAS[:welcome_subject]+ is not set.
         def send_signup_notification
-          deliver_email(:signup, :subject => (MaAS[:welcome_subject] || "Please Activate Your Account") )
+          deliver_activation_email(:signup,      :subject => (MaAS[:welcome_subject] || "Please Activate Your Account") )
         end
 
         private
 
         # Helper method delivering the email.
-        def deliver_email(action, params)
+        def deliver_activation_email(action, params)
           from = MaAS[:from_email]
-          # MaAS::UserMailer.dispatch_and_deliver(action, params.merge(:from => from, :to => self.email), MA[:single_resource] => self)
-          puts ">>> Send email to #{self.email} from #{MaAS[:from_email]}"
+          raise "No :from_email option set for Merb::Slices::config[:merb_auth_slice_activation][:from_email]" unless from
+          MaAS::ActivationMailer.dispatch_and_deliver(action, params.merge(:from => from, :to => self.email), :user => self)
         end
 
         def set_activated_data!
