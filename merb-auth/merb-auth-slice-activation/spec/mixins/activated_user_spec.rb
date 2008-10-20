@@ -15,13 +15,13 @@ end
 
 describe "Actviated User" do
   before(:all) do
-    Merb::Router.prepare { add_slice(:merb_auth_slice_activation)} 
+    Merb::Router.prepare { add_slice(:merb_auth_slice_activation)}
   end
-  
+
   after(:all) do
     Merb::Router.reset!
   end
-  
+
   describe "ActivatedUser Mixin" do
 
     include ActivatedUserSpecHelper
@@ -91,7 +91,7 @@ describe "Actviated User" do
     after(:each) do
       Utilisateur.all.destroy!
     end
-  
+
     before(:each) do
       @user = Utilisateur.new(user_attributes)
     end
