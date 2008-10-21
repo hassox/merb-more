@@ -2,6 +2,8 @@ require 'rubygems'
 require 'merb-core'
 require 'merb-slices'
 require 'spec'
+require 'dm-core'
+require 'dm-validations'
 
 # Add merb-auth-slice-activation.rb to the search path
 Merb::Plugins.config[:merb_slices][:auto_register] = true
@@ -15,12 +17,9 @@ Merb.start_environment(
   :adapter => 'runner', 
   :environment => ENV['MERB_ENV'] || 'test',
   :merb_root => Merb.root,
-  :session_store => 'memory'
+  :session_store => :memory,
+  :exception_details => true
 )
-
-# Setup the required configuration for the slice
-Merb::Slices::config[:merb_auth_slice_activation][:from_email]        = "homer@example.com"
-Merb::Slices::config[:merb_auth_slice_activation][:activation_host]   = "example.com"
 
 module Merb
   module Test
@@ -40,6 +39,14 @@ module Merb
   end
 end
 
+module ActivatedUserSpecHelper
+  def user_attributes(options = {})
+    { :login => 'fred',
+      :email => 'fred@example.com'
+    }.merge(options)
+  end
+end
+
 class Merb::Mailer
   self.delivery_method = :test_send
 end
@@ -49,4 +56,6 @@ Spec::Runner.configure do |config|
   config.include(Merb::Test::RouteHelper)
   config.include(Merb::Test::ControllerHelper)
   config.include(Merb::Test::SliceHelper)
+  config.include(ActivatedUserSpecHelper)
+  config.before(:all){ User.auto_migrate! }
 end

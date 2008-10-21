@@ -1,23 +1,10 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-
 describe "ActivationMailer" do
 
   before(:all) do
     Merb::Router.prepare { add_slice(:merb_auth_slice_activation)}
-
-    DataMapper.setup(:default, "sqlite3::memory:")
-
-    class Utilisateur
-      include DataMapper::Resource
-      include Authentication::Mixins::ActivatedUser
-
-      property :id,    Serial
-      property :email, String
-      property :login, String
-
-    end
-    Utilisateur.auto_migrate!
+    User.auto_migrate!
   end
 
   after(:all) do
@@ -32,7 +19,7 @@ describe "ActivationMailer" do
     end
 
     before(:each) do
-      @u = Utilisateur.new(:email => "homer@simpsons.com", :login => "homer", :activation_code => "12345")
+      @u = User.new(:email => "homer@simpsons.com", :login => "homer", :activation_code => "12345")
       @mailer_params = { :from => "info@mysite.com", :to => @u.email, :subject => "Welcome to MySite.com" }
     end
 

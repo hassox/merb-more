@@ -20,6 +20,43 @@
 # application, which in turn can override or finetune the slice implementation
 # code and views.
 #
+require 'merb-auth-core'
+require File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib", "merb-auth-slice-activation", "mixins", "activated_user")
+
+# Setup the required configuration for the slice
+Merb::Slices::config[:merb_auth_slice_activation][:from_email]        = "homer@example.com"
+Merb::Slices::config[:merb_auth_slice_activation][:activation_host]   = "example.com"
+
+
+DataMapper.setup(:default, "sqlite3::memory:")
+
+class User
+  include DataMapper::Resource
+  include Merb::Authentication::Mixins::ActivatedUser
+
+  property :id,    Serial
+  property :email, String
+  property :login, String
+
+end
+
+class Merb::Authentication
+  def self.user_class
+    ::User
+  end
+
+  def store_user(user)
+    return nil if user.nil?
+    user.login
+  end
+  def fetch_user(user_id)
+    User.fisrt(:login => login)
+  end
+end
+
+
+# puts Merb::Authentication.respond_to?(:user_class)
+# Merb::Authentication.user_class = User
 
 Merb::Config.use do |c|
 
@@ -34,7 +71,7 @@ Merb::Config.use do |c|
   # 'memory', 'memcache' or 'container'.  
   # You can of course use your favorite ORM instead: 
   # 'datamapper', 'sequel' or 'activerecord'.
-  c[:session_store] = 'cookie'
+  c[:session_store] = 'memory'
   
   # When running a slice standalone, you're usually developing it,
   # so enable template reloading by default.

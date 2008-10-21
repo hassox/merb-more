@@ -1,17 +1,4 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-require 'dm-core'
-require 'dm-validations'
-require File.join(File.expand_path(File.dirname(__FILE__)), "..", "..","lib", "merb-auth-slice-activation", "mixins", "activated_user")
-
-
-module ActivatedUserSpecHelper
-  def user_attributes(options = {})
-    { :login => 'fred',
-      :email => 'fred@example.com'
-    }.merge(options)
-  end
-end
-
 
 describe "Actviated User" do
   before(:all) do
@@ -27,26 +14,15 @@ describe "Actviated User" do
     include ActivatedUserSpecHelper
 
     before(:all) do
-      DataMapper.setup(:default, "sqlite3::memory:")
-
-      class Utilisateur
-        include DataMapper::Resource
-        include Authentication::Mixins::ActivatedUser
-
-        property :id,    Serial
-        property :email, String
-        property :login, String
-
-      end
-      Utilisateur.auto_migrate!
+      User.auto_migrate!
     end
 
     before(:each) do
-      @user = Utilisateur.new(user_attributes)
+      @user = User.new(user_attributes)
     end
 
     after(:each) do
-      Utilisateur.all.destroy!
+      User.all.destroy!
     end
 
     it "should add the 'activated_at' property to the user model" do
@@ -75,25 +51,15 @@ describe "Actviated User" do
     include ActivatedUserSpecHelper
 
     before(:all) do
-      DataMapper.setup(:default, "sqlite3::memory:")
-
-      class Utilisateur
-        include DataMapper::Resource
-        include Authentication::Mixins::ActivatedUser
-
-        property :id,    Serial
-        property :email, String
-        property :login, String
-      end
-      Utilisateur.auto_migrate!
+      User.auto_migrate!
     end
 
     after(:each) do
-      Utilisateur.all.destroy!
+      User.all.destroy!
     end
 
     before(:each) do
-      @user = Utilisateur.new(user_attributes)
+      @user = User.new(user_attributes)
     end
 
     it "should set the activation_code" do
@@ -109,26 +75,16 @@ describe "Actviated User" do
     include ActivatedUserSpecHelper
 
     before(:all) do
-      DataMapper.setup(:default, "sqlite3::memory:")
-
-      class Utilisateur
-        include DataMapper::Resource
-        include Authentication::Mixins::ActivatedUser
-
-        property :id,    Serial
-        property :email, String
-        property :login, String
-      end
-      Utilisateur.auto_migrate!
+      User.auto_migrate!
     end
 
     before(:each) do
-      Utilisateur.all.destroy!
-      @user = Utilisateur.create(user_attributes)
+      User.all.destroy!
+      @user = User.create(user_attributes)
     end
 
     after(:each) do
-      Utilisateur.all.destroy!
+      User.all.destroy!
     end
 
     it "should mark users as active" do
