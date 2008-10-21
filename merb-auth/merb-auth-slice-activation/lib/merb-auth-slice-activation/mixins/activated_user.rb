@@ -86,13 +86,13 @@ module Merb
           # Sends out the activation notification.
           # Used 'Welcome' as subject if +MaAS[:activation_subject]+ is not set.
           def send_activation_notification
-            deliver_activation_email(:activation,  :subject => (MaAS[:activation_subject] || "Welcome" ))
+            deliver_activation_email(:activation,  :subject => (MaAS[:welcome_subject] || "Welcome" ))
           end
 
           # Sends out the signup notification.
           # Used 'Please Activate Your Account' as subject if +MaAS[:welcome_subject]+ is not set.
           def send_signup_notification
-            deliver_activation_email(:signup,      :subject => (MaAS[:welcome_subject] || "Please Activate Your Account") )
+            deliver_activation_email(:signup,      :subject => (MaAS[:activation_subject] || "Please Activate Your Account") )
           end
 
           private

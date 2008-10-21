@@ -1,48 +1,84 @@
 MerbAuthSliceActivation
 =======================
 
-A slice for the Merb framework.
+This slice provides a check to make sure that a user is active on login.  It also provides 
+activation on the "user" object via an activation action (slice_url :activate).  When loggin in,
+the "user" object found by merb-auth-core will be asked
 
-------------------------------------------------------------------------------
+1. Do you respond_to?(:active?)
+  2. If yes, check if active and return the user if they are
+  3. If no,  return the user (i.e. no activation check)
 
-merb-auth-slice-activation
-|-- LICENSE
-|-- README
-|-- Rakefile [1]
-|-- TODO
-|-- app [2]
-|   |-- controllers
-|   |   |-- application.rb
-|   |   `-- main.rb
-|   |-- helpers
-|   |   `-- application_helper.rb
-|   `-- views
-|       |-- layout
-|       |   `-- merb-auth-slice-activation.html.erb [3]
-|       `-- main
-|           `-- index.html.erb
-|-- lib
-|   |-- merb-auth-slice-activation
-|   |   |-- merbtasks.rb [4]
-|   |   `-- slicetasks.rb [5]
-|   `-- merb-auth-slice-activation.rb [6]
-|-- log
-|   `-- merb_test.log
-|-- public [7]
-|   |-- javascripts 
-|   |   `-- master.js
-|   `-- stylesheets
-|       `-- master.css
-|-- spec [8]
-|   |-- merb-auth-slice-activation_spec.rb
-|   |-- controllers
-|   |   `-- main_spec.rb
-|   `-- spec_helper.rb
-`-- stubs [9]
-    `-- app
-        `-- controllers
-            |-- application.rb
-            `-- main.rb
+This slice adds a mixin that you should include in your user model to priovide the active? method. 
+The mixin will automatically select the correct sub mixin for all supported orms. 
+ 
+<pre><code>
+class User
+  include DataMapper::Resource
+  include Merb::Authentication::Mixins::ActivatedUser
+
+  property :id,    Serial
+end
+</code></pre>
+
+The mixin provides a number of methods.  The most common are: 
+
+<pre><code>
+  @user.activate    # activates (and saves) the user
+  @user.activated?  # Returns the "active" status of the user
+  @user.active?     # Alias for activated?
+</pre></code>
+
+h3. Migration Requirements
+
+The mixin requires some fields to be in-place on your model.  Where needed include these in your migrations.
+<pre><code>
+  :activated_at,    DateTime
+  :activation_code, String
+</code></pre>
+
+h3. Mailers
+
+The slice contains 2 mailing actions that are setup as callback hooks on the model.  When the model is created
+a "signup" email is sent with the link to follow to activate the account.  Also an activation acknowledgment 
+email.
+
+h3. Configuration Options
+
+These options may be declared in your init.rb or environment/*.rb files
+
+Use the standard slice configuration hash to set these up
+@Merb::Slices::config[:merb_auth_slice_activation]@
+
+h4. Required
+
+:from_email         # The email account to send the email from
+:activation_host    # The host to go to for activation.  This is used to construct the 
+                    # activation link.  Symbol, String or Procs are available.
+                    # Procs will have the @user@ object passed in
+
+h4. Optional
+
+:welcome_subject    # The subject of the email to send after activation (Welcome)
+:activation_subject # The subject of the email sent to ask for activation
+
+h3. Customizing the emails
+
+To customize your emails, rake the slices stubs
+
+<pre><code>
+  $ rake slices:merb_auth_slice_activation:stubs
+</code></pre>
+
+This will create stubs of the views in @slices/merb-auth-slice-activation/app/mailers/views/@
+
+To create HTML emails just add an html template like @signup.html.erb@
+
+h3. Customize the Redirect after activation
+
+rake the slices stubs as above. There is an @activations.rb@ controller in the
+@slices/merb-auth-slice-activation/app/controllers@ directory.  You can overwrite the stubbed 
+method in there to have it change it's redirection behavior.
 
 
 1. Rake tasks to package/install the gem - edit this to modify the manifest.

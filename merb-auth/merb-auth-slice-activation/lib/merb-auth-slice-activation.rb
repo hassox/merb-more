@@ -5,6 +5,8 @@ if defined?(Merb::Plugins)
   load_dependency 'merb-slices'
   load_dependency 'merb-auth-core'
   load_dependency 'merb-mailer'
+  require(File.expand_path(File.dirname(__FILE__) / "merb-auth-slice-activation" / "mixins") / "activated_user")
+  
   Merb::Plugins.add_rakefiles "merb-auth-slice-activation/merbtasks", "merb-auth-slice-activation/slicetasks", "merb-auth-slice-activation/spectasks"
 
   # Register the Slice for the current host application
